@@ -34,7 +34,6 @@ void Server::receiveFromClients()
 		while(i < (unsigned int)data_length)
 		{
 			packet.deserialize(&network_data[i]);
-			printf("Package Type: %d   Packet Data: %d\n", packet.packet_type, packet.packet_data);
 			i += sizeof(Packet);
 
 			switch(packet.packet_type)
@@ -42,6 +41,10 @@ void Server::receiveFromClients()
 			case INIT_CONNECTION:
 				printf("Server received INIT_CONNECTION packet from client\n");
                 break;
+			case PING_EVENT:
+				printf("The server has received a PING_EVENT packet from %d", iter->second);
+				sendPacket(PING_EVENT, iter->second);
+				break;
 			case MESSAGE_EVENT:
 				printf("Server received MESSAGE_EVENT packet from client\n");
                 break;
@@ -53,15 +56,15 @@ void Server::receiveFromClients()
 	}
 }
 
-void Server::sendMessagePacket(char* message)
+void Server::sendPacket(PacketType packet_type, SOCKET ignore)
 {
 	const unsigned int packet_size = sizeof(Packet);
 	char packet_data[packet_size];
 
 	Packet packet;
-	packet.packet_type = MESSAGE_EVENT;
+	packet.packet_type = packet_type;
 
 	packet.serialize(packet_data);
 
-	network->sendToAll(packet_data, packet_size);
+	network->sendToAll(packet_data, packet_size, ignore);
 }

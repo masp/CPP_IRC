@@ -15,5 +15,5 @@ private:
 	char network_data[MAX_PACKET_SIZE];
 
 	void receiveFromClients();
-	void sendMessagePacket(char* message);
+	void sendPacket(PacketType, SOCKET);
 };

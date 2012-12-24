@@ -104,7 +104,7 @@ int ServerNetwork::receiveData(unsigned int client_id, char * p_recvbuf)
 	return 0;
 }
 
-void ServerNetwork::sendToAll(char* packets, int totalSize)
+void ServerNetwork::sendToAll(char* packets, int totalSize, SOCKET ignore)
 {
 	SOCKET currentSocket;
 	map<unsigned int, SOCKET>::iterator iter;
@@ -113,6 +113,10 @@ void ServerNetwork::sendToAll(char* packets, int totalSize)
 	for(iter = sessions.begin() ; iter != sessions.end() ; iter++)
 	{
 		currentSocket = iter->second;
+		if (currentSocket == ignore)
+		{
+			continue;
+		}
 		iSendResult = NetworkServices::sendMessage(currentSocket, packets, totalSize);
 		if (iSendResult == SOCKET_ERROR)
 		{

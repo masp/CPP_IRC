@@ -6,13 +6,13 @@
 enum PacketType 
 {
 	INIT_CONNECTION = 0x00,
-	MESSAGE_EVENT = 0x01,
+	PING_EVENT = 0x01,
+	MESSAGE_EVENT = 0x02,
 };
 
 struct Packet
 {
 	unsigned char packet_type;
-	char* packet_data;
 
 	void serialize(char* p_data)
 	{

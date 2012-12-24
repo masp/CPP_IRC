@@ -16,5 +16,5 @@ public:
 
 	bool acceptNewClient(unsigned int& id);
 	int receiveData(unsigned int client_id, char* p_recvbuf);
-	void sendToAll(char* packets, int totalSize);
+	void sendToAll(char* packets, int totalSize, SOCKET ignore);
 };

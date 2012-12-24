@@ -4,7 +4,7 @@ Client::Client(void)
 {
 	network = new ClientNetwork();
 
-	if (int result = sendPacket(INIT_CONNECTION) <= 0)
+	if (int result = sendPacket(INIT_CONNECTION, "Initializing connection...") <= 0)
 	{
 		printf("Failed to connected to server with error: %d", result);
 	}
@@ -14,13 +14,17 @@ Client::Client(void)
 	}
 }
 
-int Client::sendPacket(PacketType packet_type)
+int Client::sendPacket(PacketType packet_type, char data[])
 {
 	const unsigned int packet_size = sizeof(Packet);
 	char packet_data[packet_size];
 
 	Packet packet;
-	packet.packet_type = packet_type;
+	packet.packet_data[0] = packet_type;
+	for(int i=0 ; i<sizeof(data) ; i++)
+	{
+		packet.packet_data[i + 1] = data[i];
+	}
 
 	packet.serialize(packet_data);
 
@@ -43,7 +47,7 @@ void Client::update()
 		packet.deserialize(&network_data[i]);
 		i += sizeof(Packet);
 
-		switch(packet.packet_type)
+		switch(packet.packet_data[0])
 		{
 		case PING_EVENT:
 			printf("You have been pinged by server");

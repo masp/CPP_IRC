@@ -31,19 +31,30 @@ void Server::receiveFromClients()
 			continue;
 		}
 		unsigned int i=0;
+		char* p_ping_message ("Ping from client_id ");
 		while(i < (unsigned int)data_length)
 		{
 			packet.deserialize(&network_data[i]);
 			i += sizeof(Packet);
 
-			switch(packet.packet_type)
+			switch(packet.packet_data[0])
 			{
 			case INIT_CONNECTION:
 				printf("Server received INIT_CONNECTION packet from client_id %d\n", iter->first);
                 break;
+			case CLOSE_CONNECTION:
+				printf("Closing connection with client_id %d", iter->first);
+				closesocket(iter->second);
+				network->sessions.erase(iter);
+				if (client_id > 0)
+				{
+					client_id--;
+				}
+				break;
 			case PING_EVENT:
 				printf("Server received PING_EVENT packet from client_id %d\n", iter->first);
-				sendPacket(PING_EVENT, iter->second);
+				p_ping_message += iter->first;
+				sendPacket(PING_EVENT, iter->second, p_ping_message);
 				break;
 			case MESSAGE_EVENT:
 				printf("Server received MESSAGE_EVENT packet from client\n");
@@ -56,15 +67,17 @@ void Server::receiveFromClients()
 	}
 }
 
-void Server::sendPacket(PacketType packet_type, SOCKET ignore)
+void Server::sendPacket(PacketType packet_type, SOCKET ignore, char data[])
 {
 	const unsigned int packet_size = sizeof(Packet);
 	char packet_data[packet_size];
 
 	Packet packet;
-	packet.packet_type = packet_type;
-
+	packet.packet_data[0] = packet_type;
+	for(int i=0 ; i<sizeof(data) ; i++)
+	{
+		packet.packet_data[i + 1] = data[i];
+	}
 	packet.serialize(packet_data);
-
 	network->sendToAll(packet_data, packet_size, ignore);
 }

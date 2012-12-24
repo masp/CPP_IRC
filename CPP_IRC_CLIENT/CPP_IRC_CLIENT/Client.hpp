@@ -10,6 +10,6 @@ public:
 	ClientNetwork* network;
 	char network_data[MAX_PACKET_SIZE];
 
-	int sendPacket(PacketType);
+	int sendPacket(PacketType, char data[]);
 	void update();
 };

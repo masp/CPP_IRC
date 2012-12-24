@@ -22,7 +22,7 @@ ClientNetwork::ClientNetwork(void)
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_protocol = IPPROTO_TCP;
 
-	iResult = getaddrinfo("127.0.0.1", DEFAULT_PORT, &hints, &result); // TODO: Change IP
+	iResult = getaddrinfo("192.168.1.76", DEFAULT_PORT, &hints, &result);
 
 	if (iResult != 0)
 	{

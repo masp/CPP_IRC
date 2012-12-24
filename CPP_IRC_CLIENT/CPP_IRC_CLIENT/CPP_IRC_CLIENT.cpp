@@ -7,7 +7,8 @@ Client* client;
 BOOL WINAPI console_handler(DWORD ctrltype)
 {
 	running = false;
-	client->sendPacket(CLOSE_CONNECTION);
+	client->sendPacket(CLOSE_CONNECTION, "Closing connection");
+	closesocket(client->network->ConnectSocket);
 	return TRUE;
 }
 
@@ -32,13 +33,17 @@ int main()
 
 	_beginthread(clientNetworkLoop, 0, (void*)12);
 
-	string message;
+	char message[255];
 	while(running)
 	{
 		cin >> message;
 		if (message == "PING")
 		{
-			client->sendPacket(PING_EVENT);
+			client->sendPacket(PING_EVENT, "Random ping");
+		}
+		else
+		{
+			client->sendPacket(MESSAGE_EVENT, message);
 		}
 	}
 	return 0;

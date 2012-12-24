@@ -6,8 +6,9 @@
 enum PacketType 
 {
 	INIT_CONNECTION = 0x00,
-	PING_EVENT = 0x01,
-	MESSAGE_EVENT = 0x02,
+	CLOSE_CONNECTION = 0x01,
+	PING_EVENT = 0x02,
+	MESSAGE_EVENT = 0x03,
 };
 
 struct Packet

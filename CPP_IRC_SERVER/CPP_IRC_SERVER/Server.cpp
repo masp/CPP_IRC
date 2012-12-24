@@ -39,10 +39,10 @@ void Server::receiveFromClients()
 			switch(packet.packet_type)
 			{
 			case INIT_CONNECTION:
-				printf("Server received INIT_CONNECTION packet from client\n");
+				printf("Server received INIT_CONNECTION packet from client_id %d\n", iter->first);
                 break;
 			case PING_EVENT:
-				printf("The server has received a PING_EVENT packet from %d", iter->second);
+				printf("Server received PING_EVENT packet from client_id %d\n", iter->first);
 				sendPacket(PING_EVENT, iter->second);
 				break;
 			case MESSAGE_EVENT:

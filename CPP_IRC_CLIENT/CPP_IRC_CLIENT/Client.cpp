@@ -4,17 +4,9 @@ Client::Client(void)
 {
 	network = new ClientNetwork();
 
-	const unsigned int packet_size = sizeof(Packet);
-	char packet_data[packet_size];
-
-	Packet packet;
-	packet.packet_type = INIT_CONNECTION;
-	packet.serialize(packet_data);
-
-	int result = NetworkServices::sendMessage(network->ConnectSocket, packet_data, packet_size);
-	if (result <= 0)
+	if (int result = sendPacket(INIT_CONNECTION) <= 0)
 	{
-		printf("Failed to connected to server with error: " + result);
+		printf("Failed to connected to server with error: %d", result);
 	}
 	else
 	{
@@ -22,22 +14,17 @@ Client::Client(void)
 	}
 }
 
-void Client::sendMessagePacket(char* message)
+int Client::sendPacket(PacketType packet_type)
 {
 	const unsigned int packet_size = sizeof(Packet);
 	char packet_data[packet_size];
 
 	Packet packet;
-	packet.packet_type = MESSAGE_EVENT;
-	packet.packet_data = message;
+	packet.packet_type = packet_type;
 
 	packet.serialize(packet_data);
 
-	int result = NetworkServices::sendMessage(network->ConnectSocket, packet_data, packet_size);
-	if (result <= 0)
-	{
-		printf("Failed to send message!");
-	}
+	return NetworkServices::sendMessage(network->ConnectSocket, packet_data, packet_size);
 }
 
 void Client::update()
@@ -58,6 +45,9 @@ void Client::update()
 
 		switch(packet.packet_type)
 		{
+		case PING_EVENT:
+			printf("You have been pinged by server");
+			break;
 		case MESSAGE_EVENT:
 			printf("Client received MESSAGE_EVENT packet from server\n");
 			break;

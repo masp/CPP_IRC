@@ -12,17 +12,24 @@ enum PacketType
 	MESSAGE_EVENT = 0x03,		//Used to send a message
 };
 
-struct Packet
+class Packet
 {
-	unsigned char packet_data[MAX_PACKET_DATA_SIZE]; // Data stored in the packet
 
-	void serialize(char p_data[])
+public:
+
+	void serialize(PacketType type, char* data, unsigned int length)
 	{
-		memcpy(p_data, this, sizeof(Packet));
+		packet_data[0] = type;
+		memcpy(&packet_data + 1, data, length);
 	}
 	void deserialize(char p_data[])
 	{
 		memcpy(this, p_data, sizeof(Packet));
 	}
+	
+private:
+	
+	unsigned char packet_data[256]; // byte identifier + 255 length string
+	
 };
 #endif

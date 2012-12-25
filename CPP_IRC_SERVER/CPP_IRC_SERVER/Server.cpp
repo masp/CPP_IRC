@@ -8,11 +8,21 @@ Server::Server(void)
 	network = new ServerNetwork();
 }
 
+Server::~Server(void)
+{
+	map<unsigned int, SOCKET>::iterator iter;
+	for(iter = network->sessions.begin() ; iter != network->sessions.end() ; iter++)
+	{
+		closesocket(iter->second);
+	}
+	network->sessions.clear();
+}
+
 void Server::update()
 {
 	if (network->acceptNewClient(client_id))
 	{
-		printf("client %d has been connected to the server\n", client_id); 
+		printf("client %d has connected to the server\n", client_id); 
         client_id++;
 	}
 	receiveFromClients();
@@ -30,9 +40,8 @@ void Server::receiveFromClients()
 		{
 			continue;
 		}
-		unsigned int i=0;
-		char* p_ping_message ("Ping from client_id ");
-		while(i < (unsigned int)data_length)
+		int i=0;
+		while(i < data_length)
 		{
 			packet.deserialize(&network_data[i]);
 			i += sizeof(Packet);
@@ -45,16 +54,11 @@ void Server::receiveFromClients()
 			case CLOSE_CONNECTION:
 				printf("Closing connection with client_id %d", iter->first);
 				closesocket(iter->second);
-				network->sessions.erase(iter);
-				if (client_id > 0)
-				{
-					client_id--;
-				}
+				network->sessions.erase(iter->first);
 				break;
 			case PING_EVENT:
 				printf("Server received PING_EVENT packet from client_id %d\n", iter->first);
-				p_ping_message += iter->first;
-				sendPacket(PING_EVENT, iter->second, p_ping_message);
+				sendPacket(PING_EVENT, iter->second);
 				break;
 			case MESSAGE_EVENT:
 				printf("Server received MESSAGE_EVENT packet from client\n");
@@ -67,17 +71,14 @@ void Server::receiveFromClients()
 	}
 }
 
-void Server::sendPacket(PacketType packet_type, SOCKET ignore, char data[])
+void Server::sendPacket(PacketType packet_type, SOCKET ignore)
 {
 	const unsigned int packet_size = sizeof(Packet);
 	char packet_data[packet_size];
 
 	Packet packet;
 	packet.packet_data[0] = packet_type;
-	for(int i=0 ; i<sizeof(data) ; i++)
-	{
-		packet.packet_data[i + 1] = data[i];
-	}
+
 	packet.serialize(packet_data);
 	network->sendToAll(packet_data, packet_size, ignore);
 }

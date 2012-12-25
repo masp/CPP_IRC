@@ -97,7 +97,7 @@ int ServerNetwork::receiveData(unsigned int client_id, char * p_recvbuf)
 		if (iResult == 0)
 		{
 			printf("Connection Closed\n");
-			closesocket(currentSocket);
+			closesocket(currentSocket); 
 		}
 		return iResult;
 	}
@@ -122,6 +122,7 @@ void ServerNetwork::sendToAll(char* packets, int totalSize, SOCKET ignore)
 		{
 			printf("Send failed with error: %d\n", WSAGetLastError());
             closesocket(currentSocket);
+			sessions.erase(iter->first);
 		}
 	}
 }

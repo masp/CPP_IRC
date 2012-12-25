@@ -1,7 +1,7 @@
 #include <string>
 
 #ifndef MAX_PACKET_SIZE
-#define MAX_PACKET_DATA_SIZE 1024 
+#define MAX_PACKET_DATA_SIZE 1024 // 1 Kilobit
 #define MAX_PACKET_SIZE 1048576 // 1 Megabit
 
 enum PacketType 
@@ -14,7 +14,7 @@ enum PacketType
 
 struct Packet
 {
-	unsigned char packet_data[255]; // Data stored in the packet
+	unsigned char packet_data[MAX_PACKET_DATA_SIZE]; // Data stored in the packet
 
 	void serialize(char p_data[])
 	{
